@@ -124,47 +124,76 @@ layout: default
 
 ## Core Capabilities
 
-<v-clicks>
 
 - **📏 Context Length**: Variable context windows
 - **🛠️ Tool Calling**: External function execution
-- **🔍 Vision**: Native image understanding
-- **🔊 Audio**: Native audio processing
-- **📄 PDF Processing**: Native document parsing
-- **🧠 Reasoning**: Advanced thinking processes
+- **🎭 Multimodal**: Vision, audio, and document processing
+- **🧠 Reasoning**: Special layers force models to generate thinking context using advanced prompt techniques
 
-</v-clicks>
 
 </div>
 
 <div>
 
-<v-clicks at="7">
 
 ## How Reasoning Works
-
-<div style="overflow: auto; max-height: 300px;">
 
 ```mermaid {scale: 0.8}
 graph TD
     A[User Input] --> B[Thinking Process]
-    B --> C[Analysis Layer]
+    B --> C[Chain of Thought]
     C --> D[Decision Making]
-    D --> E[Action/Response]
-    E --> F[Self-Reflection]
+    D --> F[Self-Reflection]
     F --> B
 ```
 
 </div>
 
-<div class="text-sm mt-4 opacity-75">
-Special layers force models to generate thinking context using advanced prompt techniques
 </div>
 
-</v-clicks>
+---
+layout: default
+---
+
+# Model Characteristics: Know Your Tools
+
+<div class="grid grid-cols-3 gap-6 mt-8">
+
+<div class="bg-red-500/20 p-6 rounded-lg">
+
+## GPT-4.1
+
+- ⚡ **Super fast** execution
+- 📋 **Explicit instructions** required
 
 </div>
 
+<div class="bg-blue-500/20 p-6 rounded-lg">
+
+## Claude Sonnet
+
+- 🤔 **Overthinking** tendency
+- 🚀 Goes beyond initial instructions
+- 🛠️ **Excellent** tool usage
+
+</div>
+
+<div class="bg-green-500/20 p-6 rounded-lg">
+
+## Gemini
+
+- ⚡ **Quick conclusions**
+- 🦘 Tends to jump ahead
+- 🌟 **All-round model**
+
+</div>
+
+</div>
+
+<div class="mt-8 text-center">
+<div class="bg-yellow-500/20 p-4 rounded-lg inline-block">
+💡 <strong>Key Insight:</strong> Choose your model based on task requirements and adjust prompting accordingly
+</div>
 </div>
 
 ---
@@ -202,377 +231,48 @@ This fundamental characteristic affects <b>everything</b> about how we work with
 layout: default
 ---
 
-# Model Parameters: Fine-Tuning Probabilistic
+# How LLMs Generate Text: Token by Token
 
 <div class="grid grid-cols-2 gap-8">
 
 <div>
 
-## Probability Control
+## The Process
 
-```python {1|2-3|4-5|6-7|8-9}
-# Model parameters affect token selection
-temperature = 0.7    # Controls randomness
-top_p = 0.9         # Cumulative probability
-top_k = 50          # Fixed token count
-min_p = 0.05        # Baseline probability
+1. **Start with input**: "The quick brown fox"
+2. **Predict next token**: Based on probability distribution
+3. **Randomly select token**: "jumps" (45% chance)
+4. **Update context**: "The quick brown fox jumps"
+5. **Repeat**: Generate next token candidates
 
-# Lower temperature = more deterministic
-# Higher temperature = more creative
-```
-
-</div>
-
-<div>
-
-## Parameter Effects (in order)
-
-<v-clicks>
-
-- **Temperature**: Distribution of probability
-- **Top_K**: Fixed number of candidate tokens
-- **Top_P**: Cumulative sum of selected tokens  
-- **Min_P**: Baseline probability threshold
-
-</v-clicks>
-
-</div>
-
-</div>
-
----
-layout: default
----
-
-# Temperature: Controlling Randomness
-
-<div class="grid grid-cols-2 gap-8">
-
-<div>
-
-## Interactive Temperature Control
-
-<div class="mb-6">
-  <label class="block text-sm font-medium mb-2">Temperature: <span id="temp-value">1.0</span></label>
-  <input 
-    type="range" 
-    min="0" 
-    max="2" 
-    step="0.1" 
-    value="1.0" 
-    id="temperature-slider"
-    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-  />
-  <div class="flex justify-between text-xs mt-1">
-    <span>0 (Deterministic)</span>
-    <span>2 (Creative)</span>
-  </div>
-</div>
-
-<div class="bg-blue-500/20 p-4 rounded-lg">
-  <h4 class="font-bold mb-2">What happens:</h4>
-  <ul class="text-sm space-y-1">
-    <li><strong>Low (0-0.3):</strong> Predictable, focused</li>
-    <li><strong>Medium (0.7-1.0):</strong> Balanced creativity</li>
-    <li><strong>High (1.5-2.0):</strong> Very creative, unpredictable</li>
-  </ul>
+<div class="mt-6 bg-blue-500/20 p-4 rounded-lg">
+<h4 class="font-bold mb-2">Key Insight:</h4>
+<p class="text-sm">Each token generation is independent, based on current context</p>
 </div>
 
 </div>
 
 <div>
-
-## Probability Distribution
-
-<div class="bg-gray-900 p-6 rounded-lg h-80 flex items-center justify-center">
-  <svg id="bell-curve" width="320" height="220" viewBox="0 0 320 220">
-    <!-- Bell curve will be drawn here -->
-  </svg>
-</div>
-
-<div class="text-center text-sm mt-4 opacity-75">
-  <strong>Token Selection Distribution</strong><br>
-  Lower temperature = More focused on top tokens
-</div>
-
-</div>
-
-</div>
-
-<script setup>
-import { onMounted } from 'vue'
-
-onMounted(() => {
-  const slider = document.getElementById('temperature-slider')
-  const tempValue = document.getElementById('temp-value')
-  const svg = document.getElementById('bell-curve')
-  
-  const candidateTokens = ['the', 'cat', 'dog', 'house', 'car', 'book', 'tree']
-  
-  function updateCurve(temperature) {
-    tempValue.textContent = temperature
-    
-    // Clear previous curve
-    svg.innerHTML = ''
-    
-    const temp = parseFloat(temperature)
-    const baselineY = 180
-    const centerX = 160
-    const maxChartHeight = 140 // Keep peak within chart bounds
-    
-    // Calculate curve parameters - reference temp 0.5 for current peak height
-    const referenceTemp = 0.5
-    const referencePeakHeight = 80 // What the peak should be at temp 0.5
-    
-    // Peak height calculation: higher temp = lower peak, keeping within bounds
-    const peakHeight = Math.min(maxChartHeight, Math.max(15, referencePeakHeight * (referenceTemp / Math.max(temp, 0.1))))
-    
-    // Width calculation: higher temp = wider spread
-    const width = Math.max(15, temp * 35 + 15)
-    
-    // Create probability distribution curve
-    const points = []
-    for (let x = 20; x <= 300; x += 2) {
-      const distance = Math.abs(x - centerX)
-      const normalizedDistance = distance / width
-      const y = baselineY - (peakHeight * Math.exp(-normalizedDistance * normalizedDistance))
-      points.push(`${x},${y}`)
-    }
-    
-    // Create path element for curve
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-    path.setAttribute('d', `M ${points.join(' L ')}`)
-    path.setAttribute('stroke', '#60A5FA')
-    path.setAttribute('stroke-width', '3')
-    path.setAttribute('fill', 'none')
-    
-    // Add fill area under curve
-    const fillPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-    fillPath.setAttribute('d', `M ${points.join(' L ')} L 300,${baselineY} L 20,${baselineY} Z`)
-    fillPath.setAttribute('fill', '#60A5FA')
-    fillPath.setAttribute('fill-opacity', '0.3')
-    
-    svg.appendChild(fillPath)
-    svg.appendChild(path)
-    
-    // Add x-axis
-    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-    xAxis.setAttribute('x1', '20')
-    xAxis.setAttribute('y1', baselineY)
-    xAxis.setAttribute('x2', '300')
-    xAxis.setAttribute('y2', baselineY)
-    xAxis.setAttribute('stroke', '#9CA3AF')
-    xAxis.setAttribute('stroke-width', '2')
-    svg.appendChild(xAxis)
-    
-    // Add y-axis
-    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-    yAxis.setAttribute('x1', '20')
-    yAxis.setAttribute('y1', '20')
-    yAxis.setAttribute('x2', '20')
-    yAxis.setAttribute('y2', baselineY)
-    yAxis.setAttribute('stroke', '#9CA3AF')
-    yAxis.setAttribute('stroke-width', '2')
-    svg.appendChild(yAxis)
-    
-    // Add candidate tokens as x-axis labels
-    candidateTokens.forEach((token, index) => {
-      const x = 40 + (index * 40)
-      
-      // Add tick mark
-      const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-      tick.setAttribute('x1', x)
-      tick.setAttribute('y1', baselineY)
-      tick.setAttribute('x2', x)
-      tick.setAttribute('y2', baselineY + 5)
-      tick.setAttribute('stroke', '#9CA3AF')
-      tick.setAttribute('stroke-width', '1')
-      svg.appendChild(tick)
-      
-      // Add token label
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-      label.setAttribute('x', x)
-      label.setAttribute('y', baselineY + 18)
-      label.setAttribute('text-anchor', 'middle')
-      label.setAttribute('font-size', '11')
-      label.setAttribute('fill', '#D1D5DB')
-      label.textContent = token
-      svg.appendChild(label)
-      
-      // Highlight center token (most likely)
-      if (index === 3) { // 'house' is the center token
-        label.setAttribute('fill', '#F59E0B')
-        label.setAttribute('font-weight', 'bold')
-      }
-    })
-    
-    // Add y-axis label
-    const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-    yLabel.setAttribute('x', '10')
-    yLabel.setAttribute('y', '100')
-    yLabel.setAttribute('text-anchor', 'middle')
-    yLabel.setAttribute('font-size', '10')
-    yLabel.setAttribute('fill', '#9CA3AF')
-    yLabel.setAttribute('transform', 'rotate(-90, 10, 100)')
-    yLabel.textContent = 'Probability'
-    svg.appendChild(yLabel)
-    
-    // Add x-axis label
-    const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-    xLabel.setAttribute('x', '160')
-    xLabel.setAttribute('y', '210')
-    xLabel.setAttribute('text-anchor', 'middle')
-    xLabel.setAttribute('font-size', '10')
-    xLabel.setAttribute('fill', '#9CA3AF')
-    xLabel.textContent = 'Candidate Tokens'
-    svg.appendChild(xLabel)
-  }
-  
-  slider.addEventListener('input', (e) => updateCurve(e.target.value))
-  updateCurve(1.0) // Initial curve
-})
-</script>
-
----
-layout: default
----
-
-# Top-K: Fixed Token Count
-
-<div class="grid grid-cols-2 gap-8">
-
-<div>
-
-## Interactive Top-K Control
-
-<div class="mb-6">
-  <label class="block text-sm font-medium mb-2">Top-K: <span id="topk-value">50</span></label>
-  <input 
-    type="range" 
-    min="1" 
-    max="100" 
-    step="1" 
-    value="50" 
-    id="topk-slider"
-    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-  />
-  <div class="flex justify-between text-xs mt-1">
-    <span>1 (Most Likely)</span>
-    <span>100 (Many Options)</span>
-  </div>
-</div>
-
-<div class="bg-green-500/20 p-4 rounded-lg">
-  <h4 class="font-bold mb-2">Characteristics:</h4>
-  <ul class="text-sm space-y-1">
-    <li><strong>Simple:</strong> Fixed number approach</li>
-    <li><strong>Consistent:</strong> Always K tokens</li>
-    <li><strong>Limitation:</strong> Ignores probability distribution</li>
-  </ul>
-</div>
-
-</div>
-
-<div>
-
-## Token Selection Grid
-
-<div class="bg-gray-900 p-4 rounded-lg">
-  <div id="token-grid" class="grid grid-cols-10 gap-1">
-    <!-- Token grid will be generated here -->
-  </div>
-  <div class="text-center text-sm mt-4 text-gray-400">
-    Top <span id="k-selected">50</span> tokens considered
-  </div>
-</div>
-
-</div>
-
-</div>
-
-<script setup>
-import { onMounted } from 'vue'
-
-onMounted(() => {
-  const slider = document.getElementById('topk-slider')
-  const topkValue = document.getElementById('topk-value')
-  const tokenGrid = document.getElementById('token-grid')
-  const kSelected = document.getElementById('k-selected')
-  
-  function updateTokenGrid(k) {
-    topkValue.textContent = k
-    kSelected.textContent = k
-    tokenGrid.innerHTML = ''
-    
-    for (let i = 1; i <= 100; i++) {
-      const cell = document.createElement('div')
-      cell.className = `w-6 h-6 rounded border transition-all duration-200 ${
-        i <= k ? 'bg-blue-500 border-blue-400' : 'bg-gray-700 border-gray-600'
-      }`
-      cell.textContent = i <= 20 ? i : ''
-      cell.style.fontSize = '10px'
-      cell.style.display = 'flex'
-      cell.style.alignItems = 'center'
-      cell.style.justifyContent = 'center'
-      tokenGrid.appendChild(cell)
-    }
-  }
-  
-  slider.addEventListener('input', (e) => updateTokenGrid(parseInt(e.target.value)))
-  updateTokenGrid(50)
-})
-</script>
-
----
-layout: default
----
-
-# Top-P: Cumulative Probability Cutoff
-
-<div class="grid grid-cols-2 gap-8">
-
-<div>
-
-## Interactive Top-P Control
-
-<div class="mb-6">
-  <label class="block text-sm font-medium mb-2">Top-P: <span id="topp-value">0.9</span></label>
-  <input 
-    type="range" 
-    min="0.1" 
-    max="1.0" 
-    step="0.05" 
-    value="0.9" 
-    id="topp-slider"
-    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-  />
-  <div class="flex justify-between text-xs mt-1">
-    <span>0.1 (Very Focused)</span>
-    <span>1.0 (All Tokens)</span>
-  </div>
-</div>
-
-<div class="bg-purple-500/20 p-4 rounded-lg">
-  <h4 class="font-bold mb-2">How it works:</h4>
-  <ul class="text-sm space-y-1">
-    <li>Ranks tokens by probability</li>
-    <li>Selects tokens until cumulative probability reaches Top-P</li>
-    <li>Ignores remaining low-probability tokens</li>
-  </ul>
-</div>
-
-</div>
-
-<div>
-
-## Token Selection Visualization
 
 <div class="bg-gray-900 p-6 rounded-lg">
-  <div id="token-bars" class="space-y-2">
-    <!-- Token probability bars will be generated here -->
+  <div id="token-sequence" class="mb-6">
+    <div class="text-lg font-mono mb-4">
+      <span class="text-blue-300" id="current-sequence">The quick brown fox</span>
+      <span class="text-yellow-300 ml-2" id="next-token"></span>
+    </div>
   </div>
-  <div class="text-center text-sm mt-4 text-gray-400">
-    <span id="selected-count">0</span> tokens selected
+  
+  <div id="candidate-tokens" class="space-y-2">
+    <!-- Token candidates will be shown here -->
+  </div>
+  
+  <div class="mt-6 flex gap-4">
+    <button id="reset-btn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm">
+      Reset
+    </button>
+    <button id="auto-generate" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-sm">
+      Auto Generate
+    </button>
   </div>
 </div>
 
@@ -584,242 +284,154 @@ layout: default
 import { onMounted } from 'vue'
 
 onMounted(() => {
-  const slider = document.getElementById('topp-slider')
-  const toppValue = document.getElementById('topp-value')
-  const tokenBars = document.getElementById('token-bars')
-  const selectedCount = document.getElementById('selected-count')
+  const currentSequence = document.getElementById('current-sequence')
+  const nextToken = document.getElementById('next-token')
+  const candidateTokens = document.getElementById('candidate-tokens')
+  const resetBtn = document.getElementById('reset-btn')
+  const autoGenerate = document.getElementById('auto-generate')
   
-  const tokens = [
-    { name: 'the', prob: 0.25 },
-    { name: 'and', prob: 0.20 },
-    { name: 'a', prob: 0.15 },
-    { name: 'to', prob: 0.12 },
-    { name: 'of', prob: 0.10 },
-    { name: 'in', prob: 0.08 },
-    { name: 'is', prob: 0.05 },
-    { name: 'that', prob: 0.03 },
-    { name: 'for', prob: 0.02 }
-  ]
+  let isAutoGenerating = false
+  let autoInterval = null
   
-  function updateTokenSelection(topP) {
-    toppValue.textContent = topP
-    tokenBars.innerHTML = ''
+  // Token probability scenarios for different contexts
+  const tokenScenarios = {
+    "The quick brown fox": [
+      { token: "jumps", prob: 0.45, color: "bg-green-500" },
+      { token: "runs", prob: 0.25, color: "bg-blue-500" },
+      { token: "walks", prob: 0.15, color: "bg-purple-500" },
+      { token: "flies", prob: 0.10, color: "bg-orange-500" },
+      { token: "sleeps", prob: 0.05, color: "bg-gray-500" }
+    ],
+    "The quick brown fox jumps": [
+      { token: "over", prob: 0.60, color: "bg-green-500" },
+      { token: "through", prob: 0.20, color: "bg-blue-500" },
+      { token: "across", prob: 0.12, color: "bg-purple-500" },
+      { token: "around", prob: 0.05, color: "bg-orange-500" },
+      { token: "under", prob: 0.03, color: "bg-gray-500" }
+    ],
+    "The quick brown fox jumps over": [
+      { token: "the", prob: 0.70, color: "bg-green-500" },
+      { token: "a", prob: 0.20, color: "bg-blue-500" },
+      { token: "an", prob: 0.05, color: "bg-purple-500" },
+      { token: "some", prob: 0.03, color: "bg-orange-500" },
+      { token: "several", prob: 0.02, color: "bg-gray-500" }
+    ],
+    "The quick brown fox jumps over the": [
+      { token: "lazy", prob: 0.50, color: "bg-green-500" },
+      { token: "sleeping", prob: 0.20, color: "bg-blue-500" },
+      { token: "old", prob: 0.15, color: "bg-purple-500" },
+      { token: "big", prob: 0.10, color: "bg-orange-500" },
+      { token: "small", prob: 0.05, color: "bg-gray-500" }
+    ],
+    "The quick brown fox jumps over the lazy": [
+      { token: "dog", prob: 0.80, color: "bg-green-500" },
+      { token: "cat", prob: 0.10, color: "bg-blue-500" },
+      { token: "bear", prob: 0.05, color: "bg-purple-500" },
+      { token: "horse", prob: 0.03, color: "bg-orange-500" },
+      { token: "cow", prob: 0.02, color: "bg-gray-500" }
+    ]
+  }
+  
+  function updateCandidateTokens(sequence) {
+    const candidates = tokenScenarios[sequence] || []
+    candidateTokens.innerHTML = ''
     
-    let cumulative = 0
-    let selected = 0
+    if (candidates.length === 0) {
+      candidateTokens.innerHTML = '<div class="text-gray-400 text-center">End of sequence</div>'
+      return
+    }
     
-    tokens.forEach((token, index) => {
-      const bar = document.createElement('div')
-      bar.className = 'flex items-center space-x-2'
+    candidates.forEach((candidate, index) => {
+      const tokenDiv = document.createElement('div')
+      tokenDiv.className = `flex items-center justify-between p-3 rounded cursor-pointer hover:opacity-80 transition-all ${candidate.color}`
       
-      const isSelected = cumulative < topP
-      if (isSelected) {
-        cumulative += token.prob
-        selected++
-      }
-      
-      bar.innerHTML = `
-        <div class="w-16 text-xs text-right">${token.name}</div>
-        <div class="flex-1 bg-gray-700 h-4 rounded">
-          <div class="h-4 rounded transition-all duration-300 ${isSelected ? 'bg-blue-500' : 'bg-gray-600'}" 
-               style="width: ${token.prob * 100 * 2}%"></div>
+      tokenDiv.innerHTML = `
+        <span class="font-mono font-bold">${candidate.token}</span>
+        <div class="flex items-center space-x-2">
+          <div class="w-16 bg-white bg-opacity-20 rounded-full h-2">
+            <div class="h-2 bg-white rounded-full transition-all duration-500" style="width: ${candidate.prob * 100}%"></div>
+          </div>
+          <span class="text-sm">${(candidate.prob * 100).toFixed(1)}%</span>
         </div>
-        <div class="w-12 text-xs">${(token.prob * 100).toFixed(1)}%</div>
       `
-      tokenBars.appendChild(bar)
+      
+      tokenDiv.addEventListener('click', () => {
+        const newSequence = sequence + ' ' + candidate.token
+        currentSequence.textContent = newSequence
+        nextToken.textContent = ''
+        updateCandidateTokens(newSequence)
+      })
+      
+      candidateTokens.appendChild(tokenDiv)
     })
-    
-    selectedCount.textContent = selected
   }
   
-  slider.addEventListener('input', (e) => updateTokenSelection(parseFloat(e.target.value)))
-  updateTokenSelection(0.9)
+  function resetSequence() {
+    currentSequence.textContent = 'The quick brown fox'
+    nextToken.textContent = ''
+    updateCandidateTokens('The quick brown fox')
+    stopAutoGenerate()
+  }
+  
+  function generateNextToken() {
+    const currentSeq = currentSequence.textContent
+    const candidates = tokenScenarios[currentSeq]
+    
+    if (!candidates || candidates.length === 0) {
+      stopAutoGenerate()
+      return
+    }
+    
+    // Simulate probabilistic selection (weighted random)
+    const rand = Math.random()
+    let cumulative = 0
+    let selectedToken = candidates[0]
+    
+    for (const candidate of candidates) {
+      cumulative += candidate.prob
+      if (rand <= cumulative) {
+        selectedToken = candidate
+        break
+      }
+    }
+    
+    const newSequence = currentSeq + ' ' + selectedToken.token
+    currentSequence.textContent = newSequence
+    updateCandidateTokens(newSequence)
+  }
+  
+  function stopAutoGenerate() {
+    isAutoGenerating = false
+    if (autoInterval) {
+      clearInterval(autoInterval)
+      autoInterval = null
+    }
+    autoGenerate.textContent = 'Auto Generate'
+    autoGenerate.className = 'bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-sm'
+  }
+  
+  resetBtn.addEventListener('click', resetSequence)
+  
+  autoGenerate.addEventListener('click', () => {
+    if (isAutoGenerating) {
+      stopAutoGenerate()
+    } else {
+      isAutoGenerating = true
+      autoGenerate.textContent = 'Stop Auto'
+      autoGenerate.className = 'bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm'
+      
+      autoInterval = setInterval(generateNextToken, 2000) // Generate every 2 seconds
+    }
+  })
+  
+  // Initialize
+  updateCandidateTokens('The quick brown fox')
 })
 </script>
 
----
-layout: default
----
-
-# Min-P: Minimum Probability Threshold
-
-<div class="grid grid-cols-2 gap-8">
-
-<div>
-
-## Interactive Min-P Control
-
-<div class="mb-6">
-  <label class="block text-sm font-medium mb-2">Min-P: <span id="minp-value">0.05</span></label>
-  <input 
-    type="range" 
-    min="0.01" 
-    max="0.2" 
-    step="0.01" 
-    value="0.05" 
-    id="minp-slider"
-    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-  />
-  <div class="flex justify-between text-xs mt-1">
-    <span>0.01 (Include More)</span>
-    <span>0.2 (Very Selective)</span>
-  </div>
-</div>
-
-<div class="bg-orange-500/20 p-4 rounded-lg">
-  <h4 class="font-bold mb-2">Purpose:</h4>
-  <ul class="text-sm space-y-1">
-    <li><strong>Quality Filter:</strong> Removes very unlikely tokens</li>
-    <li><strong>Adaptive:</strong> Works with any distribution</li>
-    <li><strong>Clean:</strong> Prevents nonsensical outputs</li>
-  </ul>
-</div>
-
-</div>
-
-<div>
-
-## Probability Threshold Visualization
-
-<div class="bg-gray-900 p-6 rounded-lg h-80">
-  <div class="h-full relative flex items-end">
-    <div id="prob-chart" class="w-full h-64 flex items-end justify-center gap-2">
-      <!-- Probability chart will be drawn here -->
-    </div>
-    <div id="threshold-line" class="absolute bg-red-500 w-full h-0.5 transition-all duration-300">
-      <div class="bg-red-500 text-white text-xs px-2 py-1 rounded absolute -top-8 left-0">
-        Min-P: <span id="threshold-label">0.05</span>
-      </div>
-    </div>
-  </div>
-  <div class="text-center text-sm mt-4 text-gray-400">
-    <span id="selected-tokens">0</span> tokens above threshold (highlighted in blue)
-  </div>
-</div>
-
-</div>
-
-</div>
-
-<script setup>
-import { onMounted } from 'vue'
-
-onMounted(() => {
-  const slider = document.getElementById('minp-slider')
-  const minpValue = document.getElementById('minp-value')
-  const probChart = document.getElementById('prob-chart')
-  const thresholdLine = document.getElementById('threshold-line')
-  const thresholdLabel = document.getElementById('threshold-label')
-  const selectedTokens = document.getElementById('selected-tokens')
-  
-  const probabilities = [0.25, 0.20, 0.15, 0.12, 0.08, 0.06, 0.04, 0.03, 0.02, 0.01, 0.008, 0.006, 0.004, 0.002, 0.001]
-  const tokenNames = ['the', 'cat', 'dog', 'house', 'car', 'book', 'tree', 'sky', 'run', 'big', 'old', 'new', 'red', 'fast', 'tiny']
-  
-  function updateProbChart(minP) {
-    minpValue.textContent = minP
-    thresholdLabel.textContent = minP
-    probChart.innerHTML = ''
-    
-    const maxProb = Math.max(...probabilities)
-    const chartHeight = 200
-    
-    // Position threshold line based on probability value
-    const thresholdHeight = (minP / maxProb) * chartHeight
-    thresholdLine.style.bottom = `${thresholdHeight + 24}px` // +24 for chart bottom padding
-    
-    let tokensAboveThreshold = 0
-    
-    probabilities.forEach((prob, index) => {
-      const barContainer = document.createElement('div')
-      barContainer.className = 'flex flex-col items-center'
-      
-      const height = (prob / maxProb) * chartHeight
-      const isAboveThreshold = prob >= minP
-      
-      if (isAboveThreshold) tokensAboveThreshold++
-      
-      // Create bar
-      const bar = document.createElement('div')
-      bar.className = `w-4 transition-all duration-300 ${
-        isAboveThreshold ? 'bg-blue-500' : 'bg-gray-600'
-      }`
-      bar.style.height = `${height}px`
-      bar.title = `${tokenNames[index]}: ${(prob * 100).toFixed(1)}%`
-      
-      // Create label
-      const label = document.createElement('div')
-      label.className = 'text-xs text-gray-400 mt-1 transform -rotate-45 origin-left'
-      label.style.fontSize = '10px'
-      label.textContent = tokenNames[index]
-      
-      barContainer.appendChild(bar)
-      barContainer.appendChild(label)
-      probChart.appendChild(barContainer)
-    })
-    
-    selectedTokens.textContent = tokensAboveThreshold
-  }
-  
-  slider.addEventListener('input', (e) => updateProbChart(parseFloat(e.target.value)))
-  updateProbChart(0.05)
-})
-</script>
-
----
-layout: default
----
-
-# Model Characteristics: Know Your Tools
-
-<div class="grid grid-cols-3 gap-6 mt-8">
-
-<div class="bg-red-500/20 p-6 rounded-lg">
-
-## GPT-4.1
-<v-clicks>
-
-- ⚡ **Super fast** execution
-- 📋 **Explicit instructions** required
-
-</v-clicks>
-
-</div>
-
-<div class="bg-blue-500/20 p-6 rounded-lg">
-
-## Claude Sonnet
-<v-clicks>
-
-- 🤔 **Overthinking** tendency
-- 🚀 Goes beyond initial instructions
-- 🛠️ **Excellent** tool usage
-
-</v-clicks>
-
-</div>
-
-<div class="bg-green-500/20 p-6 rounded-lg">
-
-## Gemini
-<v-clicks>
-
-- ⚡ **Quick conclusions**
-- 🦘 Tends to jump ahead
-- 🌟 **All-round model**
-
-</v-clicks>
-
-</div>
-
-</div>
-
-<div class="mt-8 text-center">
-<v-click>
-<div class="bg-yellow-500/20 p-4 rounded-lg inline-block">
-💡 <strong>Key Insight:</strong> Choose your model based on task requirements and adjust prompting accordingly
-</div>
-</v-click>
-</div>
+<!-- --- -->
+<!-- src: ./pages/model-parameters.md -->
+<!-- --- -->
 
 ---
 layout: default
@@ -835,18 +447,18 @@ layout: default
 
 <v-clicks>
 
+<div>
+
 1. **📄 Irrelevant Context**
    - Too much noise in prompt
 
 2. **❌ Bad Input Prompts**  
    - Unclear instructions
 
-3. **🔄 Reasoning Errors**
-   - Cannot self-correct wrong steps
-
-4. **📊 Premise Order**
+3. **📊 Premise Order**
    - Information sequencing matters
 
+</div>
 </v-clicks>
 
 </div>
@@ -856,12 +468,14 @@ layout: default
 ## Prevention Strategies
 
 <v-clicks>
+<div>
 
 - **📝 Good Structured and concised system prompt**
 - **🎯 Cleared and detailed user input prompt**
 - **🔧 "Fix" the context when seeing hallucinations, DONT chain hallucinations**
 - **⚠️ Avoid to use reasoning model**
 
+</div>
 </v-clicks>
 
 <div class="mt-4 text-sm opacity-75">
@@ -901,7 +515,6 @@ class: text-center
     <li>Accumulative context</li>
     <li>Pattern recognition</li>
     <li>Tool uses</li>
-    <li>Behavior adaptation</li>
   </ul>
 </div>
 
@@ -943,23 +556,15 @@ Use ReAct: Reason → Act → Observe
 
 ## Dynamic Content
 
-<v-clicks>
-
 **📚 RAG (Retrieval Augmented Generation)**
 - Based on user input
 - Controllable knowledge injection
 - Model independent
 
-**🧠 Memory Injection**
-- Past conversation context
-- User preferences
-
-**🔄 Adaptive Behavior**
-- Learning from interactions
-- Adjusting responses
-- Improving over time
-
-</v-clicks>
+**🛠️ Tool Results**
+- Deterministic responses
+- Expandable
+- Model control over execution
 
 </div>
 
@@ -971,13 +576,14 @@ layout: default
 
 # Prompt Engineering Frameworks
 
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-3 gap-3">
 
-<div class="bg-blue-500/20 p-6 rounded-lg">
+<div class="bg-blue-500/20 p-3 rounded-lg">
 
 ## ReAct Framework
 
 <v-clicks>
+<div>
 
 **Reason** → **Act** → **Observe**
 
@@ -991,15 +597,17 @@ Action: analyze_trends(data)
 
 *Structured decision making*
 
+</div>
 </v-clicks>
 
 </div>
 
-<div class="bg-green-500/20 p-6 rounded-lg">
+<div class="bg-green-500/20 p-3 rounded-lg">
 
 ## Chain-of-Thought
 
 <v-clicks>
+<div>
 
 **Step-by-step reasoning**
 
@@ -1014,15 +622,17 @@ Let me think through this:
 
 *Transparent thinking process*
 
+</div>
 </v-clicks>
 
 </div>
 
-<div class="bg-purple-500/20 p-6 rounded-lg">
+<div class="bg-purple-500/20 p-3 rounded-lg">
 
 ## Self-Consistency
 
 <v-clicks>
+<div>
 
 **Multiple reasoning paths**
 
@@ -1036,6 +646,7 @@ the most consistent answer
 ```
 
 *Improved accuracy*
+</div>
 
 </v-clicks>
 
@@ -1055,22 +666,16 @@ layout: default
 
 ## What User Prompt Includes
 
-<v-clicks>
-
 - **📝 Clear instructions** with specific task description
 - **📎 Attached files** (code, docs, images)
 - **🎯 Context acquisition guidance** (which files to examine, what should agent to search for)
 - **✅ Success criteria** and expected outcomes
-
-</v-clicks>
 
 </div>
 
 <div>
 
 ## Critical Guidelines
-
-<v-clicks>
 
 <div class="bg-blue-500/20 p-3 rounded-lg mb-3">
 <h4 class="font-bold text-sm">📋 Be Specific</h4>
@@ -1081,8 +686,6 @@ layout: default
 <h4 class="font-bold text-sm">⚠️ Accumulative Effect</h4>
 <p class="text-xs">Each prompt and tool uses adds to conversation history - context grows with every interaction</p>
 </div>
-
-</v-clicks>
 
 </div>
 
@@ -1100,8 +703,6 @@ layout: default
 
 ## Management Techniques
 
-<v-clicks>
-
 1. **📋 Task Tracking**
    - Tracking outside of context (file, memory, etc...)
    - Track completion status
@@ -1112,8 +713,6 @@ layout: default
    - Summarize old conversations
    - Remove irrelevant details
    - Preserve key insights
-
-</v-clicks>
 
 </div>
 
@@ -1196,25 +795,17 @@ layout: default
 ## Built-in Tools
 *Available in Cursor, Copilot, Claude Code*
 
-<v-clicks>
-
 - 📖 **Read File** - Access file contents
 - ✏️ **Write File** - Create/modify files  
 - 🔍 **Search Pattern** - Find code patterns
 - 📊 **Analyze Repo** - Repository analysis
 
-</v-clicks>
-
 ## Model-Native Tools
 *Platform-specific capabilities*
-
-<v-clicks>
 
 - 🌐 **Grounded Search** - Web search with sources
 - 💻 **Computer Use** - Desktop automation
 - 🌍 **Browser Use** - Web interaction
-
-</v-clicks>
 
 </div>
 
@@ -1223,7 +814,7 @@ layout: default
 ## MCPs (Model Context Protocol)
 *Connect to any external service*
 
-```json {0|3|4|5-8}
+```json
 {
   "mcpServers": {
     "playwright": {
@@ -1258,7 +849,6 @@ layout: default
 <div class="grid grid-cols-3 gap-6 mt-8">
 
 <div class="bg-red-500/20 p-6 rounded-lg">
-<v-clicks>
 
 <div class="text-center font-bold mb-4">🔒 Scoping Permissions</div>
 <div class="text-left">
@@ -1269,11 +859,9 @@ layout: default
 </ul>
 </div>
 
-</v-clicks>
 </div>
 
 <div class="bg-blue-500/20 p-6 rounded-lg">
-<v-clicks>
 
 <div class="text-center font-bold mb-4">⚡ Model Efficiency</div>
 <div class="text-left">
@@ -1284,11 +872,9 @@ layout: default
 </ul>
 </div>
 
-</v-clicks>
 </div>
 
 <div class="bg-green-500/20 p-6 rounded-lg">
-<v-clicks>
 
 <div class="text-center font-bold mb-4">🎯 Monitoring & Control</div>
 <div class="text-left">
@@ -1299,7 +885,6 @@ layout: default
 </ul>
 </div>
 
-</v-clicks>
 </div>
 
 </div>
@@ -1318,7 +903,6 @@ layout: default
 
 ## Implementation Steps
 
-<v-clicks>
 
 1. **🎯 Define Purpose**
    - Clear objectives and target use cases
@@ -1328,13 +912,11 @@ layout: default
    - Craft effective system prompt
    - Build Adaptive behavior for precise control
 
-</v-clicks>
 
 </div>
 
 <div>
 
-<v-clicks>
 
 3. **🛠️ Choose Tools**
    - Identify required capabilities
@@ -1346,7 +928,6 @@ layout: default
    - Add complexity gradually
    - Monitor performance and adjust
 
-</v-clicks>
 
 </div>
 
@@ -1365,14 +946,12 @@ class: text-center
 
 ## 🎯 **Success Formula**
 
-<v-clicks>
 
 - **Right Model** for the task
 - **Quality Context** for decisions
 - **Appropriate Tools** for capabilities  
 - **Clear Instructions** for behavior
 
-</v-clicks>
 
 </div>
 
@@ -1380,25 +959,21 @@ class: text-center
 
 ## 🚀 **Next Steps**
 
-<v-clicks>
 
 - Start with simple single-purpose agents
 - Experiment with different models
 - Build tool libraries incrementally
 - Monitor and iterate constantly
 
-</v-clicks>
 
 </div>
 
 </div>
 
 <div class="mt-12">
-<v-click>
 <div class="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 rounded-lg">
 <strong>Remember:</strong> AI Agents are powerful when Models + Context + Tools work in harmony
 </div>
-</v-click>
 </div>
 
 ---
